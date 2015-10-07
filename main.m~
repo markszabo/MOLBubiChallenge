@@ -18,8 +18,9 @@ fclose(traincsv);
 
 %% precalculate given days
 for i=1:length(days)
-    days{i}.getRoutes();
-    days{i}.getTopRoutes();
+    %days{i}.getRoutes();
+    %days{i}.getTopRoutes();
+    days{i}.getStationDemand();
 end
 
 %% estimate
@@ -34,14 +35,9 @@ for i=1:30
         dayNr = i*2-30;
     end
     estimatedDays{i} = day(sprintf('2015-%02d-%02d', monthNr, dayNr));
-    % estimatedDays{i}.topRoutes = days{90+i}.topRoutes; % copy previous day
-    if i <= 4
-        copyDay = 83 + i*2;
-    else
-        copyDay = 87 + i;
-    end
     estimatedDays{i}.routeUsage = 0.5*days{90+i}.routeUsage+0.5*days{91+i}.routeUsage;
-    
+    estimatedDays{i}.getTopRoutes();
+    %estimatedDays{i}.stationDemand = 0.5*days{90+i}.stationDemand + 0.5*days{91+i}.stationDemand;
 end
 
 %% print results
@@ -49,4 +45,5 @@ outputFile = 'outputtest';
 ftmp = fopen(outputFile,'w'); fclose(ftmp); % clear the file
 for i = 1:30;
     printTopRoutes(estimatedDays{i},outputFile);
+    %printStationDemand(estimatedDays{i}, outputFile);
 end

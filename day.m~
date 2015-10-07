@@ -60,18 +60,13 @@ classdef day < handle %needed to enable functions to change the properties of th
               demand = obj.stationDemand;
           else
               stationList = getStationList();
-              stationState = zeros(1,length(stationList));
-              demand = zeros(1,length(stationList));
+              stationState = zeros(length(stationList));
+              demand = zeros(length(stationList));
               for i=1:length(obj.trips)
-                  stationState(station2id(obj.trips(i).start_location)) = ...
-                      stationState(station2id(obj.trips(i).start_location)) + 1;
-                  stationState(station2id(obj.trips(i).end_location)) = ...
-                      stationState(station2id(obj.trips(i).end_location)) - 1;
-                  if(stationState(station2id(obj.trips(i).start_location)) > demand(station2id(obj.trips(i).start_location)))
-                      demand(station2id(obj.trips(i).start_location)) = stationState(station2id(obj.trips(i).start_location));
-                  end
+                  stationState(station2id(obj.trips{i}.start_location)) = ...
+                      stationState(station2id(obj.trips{i}.start_location)) + 1;
+                  
               end
-              obj.stationDemand = demand;
           end
       end
    end
