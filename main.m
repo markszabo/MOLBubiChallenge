@@ -34,13 +34,8 @@ for i=1:30
         dayNr = i*2-30;
     end
     estimatedDays{i} = day(sprintf('2015-%02d-%02d', monthNr, dayNr));
-    % estimatedDays{i}.topRoutes = days{90+i}.topRoutes; % copy previous day
-    if i <= 4
-        copyDay = 83 + i*2;
-    else
-        copyDay = 87 + i;
-    end
-    estimatedDays{i}.topRoutes = days{copyDay}.topRoutes;
+    estimatedDays{i}.routeUsage = 0.5*days{90+i}.routeUsage+0.5*days{91+i}.routeUsage;
+    estimatedDays{i}.getTopRoutes();
 end
 
 %% print results
