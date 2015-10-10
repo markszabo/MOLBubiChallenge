@@ -34,15 +34,25 @@ for i=1:30
         dayNr = i*2-30;
     end
     estimatedDays{i} = day(sprintf('2015-%02d-%02d', monthNr, dayNr));
-    %estimatedDays{i}.routeUsage = 0.7*days{90+i}.routeUsage+0.3*days{91+i}.routeUsage;
+    %estimatedDays{i}.routeUsage = 0.6*days{90+i}.routeUsage+0.4*days{91+i}.routeUsage;
     %estimatedDays{i}.getTopRoutes();
-    estimatedDays{i}.stationDemand = 0.5*days{90+i}.stationDemand + 0.5*days{91+i}.stationDemand;
+    estimatedDays{i}.stationDemand = 0.52*days{90+i}.stationDemand + 0.48*days{91+i}.stationDemand;
 end
 
 %% print results
 outputFile = 'outputtest';
 ftmp = fopen(outputFile,'w'); fclose(ftmp); % clear the file
 for i = 1:30;
-    %printTopRoutes(estimatedDays{i},outputFile);
+    % printTopRoutes(estimatedDays{i},outputFile);
     printStationDemand(estimatedDays{i}, outputFile);
 end
+
+%% calculate differences
+outputFile = 'BRPdiff.csv';
+ftmp = fopen(outputFile,'w'); 
+for i=2:length(days)
+    diff = dayDifferenceBRP(days{i-1},days{i});
+    [DayNumber,DayName] = weekday(days{i}.date, 'long');
+    fprintf(ftmp,'%s->%s;%s;%s\n',days{i-1}.date,days{i}.date,DayName,num2str(diff));
+end
+fclose(ftmp);
