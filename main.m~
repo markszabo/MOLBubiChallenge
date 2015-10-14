@@ -45,7 +45,7 @@ for i=1:30
     input(1) = weekday(estimatedDays{i}.date);
     date = strsplit(estimatedDays{i}.date, '-');
     input(2) = str2double(cell2mat(date(2))); %month
-    input(3) = str2double(cell2mat(date(3))); %day
+    input(3,i) = str2double(cell2mat(date(3))); %day
     estimatedDays{i}.routeUsage = reshape(nnDef10hidden(input),[length(getStationList()),length(getStationList())]);
     estimatedDays{i}.getTopRoutes();
 end

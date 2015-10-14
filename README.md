@@ -28,3 +28,7 @@ My trials and errors for the MOL Bubi Big Data Challenge (https://dms.sztaki.hu/
 2015-10-10 BRP - 0.6*yesterday+0.4*tomorrow, worse: 0.589907791
 
 (*)2015-10-10 DSDP - 0.52*yesterday+0.48*tomorrow, slightly better than half-half: 5.190847659
+
+2015-10-11 BRP if Sunday, or Saturday, copy the other weekend day, if Monday copy Tuesday, otherwise half-half: 0.569184803
+
+2015-10-14 BRP Mayor improvement with Neural network! With default configuration and 10 hidden neuron: 0.661506442. Meanwhile I got back to the 4th place, but now 2nd again!
