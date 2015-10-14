@@ -1,5 +1,8 @@
 clear;
 
+task = 'DSDP';
+%task = 'BRP';
+
 days = {day('2015-01-01')};
 
 traincsv = fopen('mol_bubi_dataset/train.csv','r'); % open csv file for reading
@@ -17,17 +20,26 @@ fclose(traincsv);
 
 %% precalculate given days
 clear nnTargets; clear nnInputs;
-nnTargets = zeros(length(getStationList())*length(getStationList()),length(days));
 nnInputs = zeros(3,length(days));
+if strcmp(task,'BRP')
+    nnTargets = zeros(length(getStationList())*length(getStationList()),length(days));
+else %DSDP
+    nnTargets = zeros(length(getStationList()),length(days));
+end
 for i=1:length(days)
-    nnTargets(:,i) = reshape(days{i}.getRoutes(),[length(getStationList())*length(getStationList()),1]);
-    days{i}.getTopRoutes(); 
+    if strcmp(task,'BRP')
+        nnTargets(:,i) = reshape(days{i}.getRoutes(),[length(getStationList())*length(getStationList()),1]);
+        days{i}.getTopRoutes();
+    else
+        nnTargets(:,i) = days{i}.getStationDemand();
+    end
     nnInputs(1,i) = weekday(days{i}.date); %day of week
     date = strsplit(days{i}.date, '-');
     nnInputs(2,i) = str2double(cell2mat(date(2))); %month
     nnInputs(3,i) = str2double(cell2mat(date(3))); %day
-    %days{i}.getStationDemand();
 end
+
+%% train the neural network
 
 %% neural network estimation
 clear estimatedDays;
@@ -45,9 +57,13 @@ for i=1:30
     input(1) = weekday(estimatedDays{i}.date);
     date = strsplit(estimatedDays{i}.date, '-');
     input(2) = str2double(cell2mat(date(2))); %month
-    input(3,i) = str2double(cell2mat(date(3))); %day
-    estimatedDays{i}.routeUsage = reshape(nnDef10hidden(input),[length(getStationList()),length(getStationList())]);
-    estimatedDays{i}.getTopRoutes();
+    input(3) = str2double(cell2mat(date(3))); %day
+    if strcmp(task,'BRP')
+        estimatedDays{i}.routeUsage = reshape(nnDef50hidden(input),[length(getStationList()),length(getStationList())]);
+        estimatedDays{i}.getTopRoutes();
+    else
+        estimatedDays{i}.stationDemand = dsdpDef6hid(input);
+    end
 end
 %% estimate
 clear estimatedDays;
@@ -76,8 +92,11 @@ end
 outputFile = 'outputtest';
 ftmp = fopen(outputFile,'w'); fclose(ftmp); % clear the file
 for i = 1:30;
-    printTopRoutes(estimatedDays{i},outputFile);
-    % printStationDemand(estimatedDays{i}, outputFile);
+    if strcmp(task,'BRP')
+        printTopRoutes(estimatedDays{i},outputFile);
+    else
+        printStationDemand(estimatedDays{i}, outputFile);
+    end
 end
 
 %% calculate differences
