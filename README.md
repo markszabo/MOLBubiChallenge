@@ -42,3 +42,7 @@ My trials and errors for the MOL Bubi Big Data Challenge (https://dms.sztaki.hu/
 2015-10-14 DSDP scaled algorithm, 10 hidden neuron, worse result: 4.493603817
 
 2015-10-14 DSDP default algorithm, 6 hidden neuron, worse result: 4.753790279
+
+2015-10-15 BRP I separated every day into halfhours and run neural network for them (def algo, 10 hidden). Slightly worse result than before: 0.641336429
+
+

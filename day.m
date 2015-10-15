@@ -1,40 +1,37 @@
 classdef day < handle %needed to enable functions to change the properties of the class 
    properties
       date % date in 2015-05-16 format
-      trips % array of trips made on the day
-      weather % array of the weather on the whole day
+      %trips % array of trips made on the day
+      %weather % array of the weather on the whole day
       routeUsage %all routes
       topRoutes %top 100 routes
       stationDemand
+      halfHours
    end
    methods
       function d = day(dayDate)
-           d.trips = trip.empty;
            d.date = dayDate;
+           ddd = strsplit(dayDate,'-');
+           d.halfHours = halfHour.empty;
+           for i=1:48
+               d.halfHours(i) = halfHour(ddd{2},ddd{3},(i-1)*0.5);
+           end
       end
       
-      function addTrip(obj, t)
-          obj.trips(length(obj.trips)+1) = t;
-      end
-      
-      function r = getRoutes(obj)
-        if(not(isempty(obj.routeUsage))) %if it was calculated perviously, just return it
-            r = obj.routeUsage;
-        else %if it wasn't calculated yet, do it now
-            routeUse = zeros(length(getStationList()),length(getStationList())); % first coord: from where, second: to where
-            for i=1:length(obj.trips)
-                routeUse(station2id(obj.trips(i).start_location), station2id(obj.trips(i).end_location)) = 1 + ...
-                            routeUse(station2id(obj.trips(i).start_location), station2id(obj.trips(i).end_location));
-            end
-            obj.routeUsage = routeUse;
-            r = routeUse;
-        end
+      function addHalfHour(obj, h)
+          obj.halfHours(length(obj.halfHours)+1) = h;
       end
       
       function top = getTopRoutes(obj) %get top 100 routes in this format: 0201-0202,4
           if(not(isempty(obj.topRoutes)))
               top = obj.topRoutes;
           else
+              %first summarize the halfHour route usages
+              obj.routeUsage = zeros(length(getStationList()));
+              for i = 1:length(obj.halfHours)
+                 obj.routeUsage = obj.routeUsage + obj.halfHours(i).getRoutes();
+              end
+              %then calculate the tops
               topNrs = zeros(100);
               top = repmat({''}, 100, 1);
               for i = 1:size(obj.routeUsage,1)
