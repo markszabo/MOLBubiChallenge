@@ -45,4 +45,8 @@ My trials and errors for the MOL Bubi Big Data Challenge (https://dms.sztaki.hu/
 
 2015-10-15 BRP I separated every day into halfhours and run neural network for them (def algo, 10 hidden). Slightly worse result than before: 0.641336429
 
+2015-10-17 BRP I mixed the halfhours back to days, and used some data from the weather of the day as input. Worse result: 0.651494714
 
+2015-10-17 BRP same as before just with Bayesian method and 12 hidden neuron (for the 12 inputs). Slightly better result: 0.656297313
+
+2015-10-17 BRP same as before just def algo, 24 hidden neuron. Slightly better: 0.658004536

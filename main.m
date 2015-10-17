@@ -98,58 +98,64 @@ fclose(weathercsv);
 
 %% precalculate given days
 clear nnTargets; clear nnInputs;
-nnInputs = zeros(11,length(days));
+nnInputs = zeros(12,length(days));
 if strcmp(task,'BRP')
-    nnTargets = zeros(length(getStationList())*length(getStationList()),nrOfHalfHours);
+    nnTargets = zeros(length(getStationList())*length(getStationList()),length(days));
 else %DSDP
     nnTargets = zeros(length(getStationList()),length(days));
 end
-countTheHHours = 0;
 for i=1:length(days)
-    for j=1:length(days{i}.halfHours)
-        if strcmp(task,'BRP')
-            countTheHHours = 1 + countTheHHours;
-            nnTargets(:,countTheHHours) = reshape(days{i}.halfHours(j).getRoutes(),[length(getStationList())*length(getStationList()),1]);
-            %days{i}.getTopRoutes();
-        else
-            nnTargets(:,i) = days{i}.getStationDemand();
-        end
-        nnInputs(1,countTheHHours) = weekday(days{i}.date); %day of week
-        nnInputs(2,countTheHHours) = days{i}.halfHours(j).month;
-        nnInputs(3,countTheHHours) = days{i}.halfHours(j).day;
-        nnInputs(4,countTheHHours) = days{i}.halfHours(j).hour;
-        nnInputs(5,countTheHHours) = days{i}.halfHours(j).weather.tempm;
-        nnInputs(6,countTheHHours) = days{i}.halfHours(j).weather.hum;
-        nnInputs(7,countTheHHours) = days{i}.halfHours(j).weather.rain;
-        nnInputs(8,countTheHHours) = days{i}.halfHours(j).weather.wspdm;
-        nnInputs(9,countTheHHours) = days{i}.halfHours(j).weather.vism;
-        nnInputs(10,countTheHHours) = days{i}.halfHours(j).weather.windchillm;
-        nnInputs(11,countTheHHours) = days{i}.halfHours(j).weather.thunder;
+    if strcmp(task,'BRP')
+        days{i}.getRoutesFromHalfHours();
+        nnTargets(:,i) = reshape(days{i}.routeUsage,[length(getStationList())*length(getStationList()),1]);
+    else
+        nnTargets(:,i) = days{i}.getStationDemand();
     end
+    nnInputs(1,i) = weekday(days{i}.date); %day of week
+    nnInputs(2,i) = days{i}.halfHours(1).month;
+    nnInputs(3,i) = days{i}.halfHours(1).day;
+
+    nnInputs(4,i) = days{i}.halfHours(10).weather.tempm;
+    nnInputs(5,i) = days{i}.halfHours(20).weather.tempm;
+    nnInputs(6,i) = days{i}.halfHours(30).weather.tempm;
+    nnInputs(7,i) = days{i}.halfHours(40).weather.tempm;
+    
+    nnInputs(8,i) = days{i}.halfHours(1).weather.rain + days{i}.halfHours(2).weather.rain + days{i}.halfHours(3).weather.rain + days{i}.halfHours(4).weather.rain + days{i}.halfHours(5).weather.rain + days{i}.halfHours(6).weather.rain + days{i}.halfHours(7).weather.rain + days{i}.halfHours(8).weather.rain + days{i}.halfHours(9).weather.rain + days{i}.halfHours(10).weather.rain;
+    nnInputs(9,i) = days{i}.halfHours(11).weather.rain + days{i}.halfHours(12).weather.rain + days{i}.halfHours(13).weather.rain + days{i}.halfHours(14).weather.rain + days{i}.halfHours(15).weather.rain + days{i}.halfHours(16).weather.rain + days{i}.halfHours(17).weather.rain + days{i}.halfHours(18).weather.rain + days{i}.halfHours(19).weather.rain + days{i}.halfHours(20).weather.rain;
+    nnInputs(10,i) = days{i}.halfHours(21).weather.rain + days{i}.halfHours(22).weather.rain + days{i}.halfHours(23).weather.rain + days{i}.halfHours(24).weather.rain + days{i}.halfHours(25).weather.rain + days{i}.halfHours(26).weather.rain + days{i}.halfHours(27).weather.rain + days{i}.halfHours(28).weather.rain + days{i}.halfHours(29).weather.rain + days{i}.halfHours(30).weather.rain;
+    nnInputs(11,i) = days{i}.halfHours(31).weather.rain + days{i}.halfHours(32).weather.rain + days{i}.halfHours(33).weather.rain + days{i}.halfHours(34).weather.rain + days{i}.halfHours(35).weather.rain + days{i}.halfHours(36).weather.rain + days{i}.halfHours(37).weather.rain + days{i}.halfHours(38).weather.rain + days{i}.halfHours(39).weather.rain + days{i}.halfHours(40).weather.rain; 
+    nnInputs(12,i) = days{i}.halfHours(41).weather.rain + days{i}.halfHours(42).weather.rain + days{i}.halfHours(43).weather.rain + days{i}.halfHours(44).weather.rain + days{i}.halfHours(45).weather.rain + days{i}.halfHours(46).weather.rain + days{i}.halfHours(47).weather.rain + days{i}.halfHours(48).weather.rain;    
+%     nnInputs(6,i) = days{i}.halfHours(j).weather.hum;
+%     nnInputs(7,i) = days{i}.halfHours(j).weather.rain;
+%     nnInputs(8,i) = days{i}.halfHours(j).weather.wspdm;
+%     nnInputs(9,i) = days{i}.halfHours(j).weather.vism;
+%     nnInputs(10,i) = days{i}.halfHours(j).weather.windchillm;
+%     nnInputs(11,i) = days{i}.halfHours(j).weather.thunder;
 end
 
 %% train the neural network
 
 %% neural network estimation
 for i=1:30
-    input = zeros(11,1);
+    input = zeros(12,1);
     input(1) = weekday(estimatedDays{i}.date);
-    for hh=1:48
-        if strcmp(task,'BRP')
-            input(2) = estimatedDays{i}.halfHours(hh).month;
-            input(3) = estimatedDays{i}.halfHours(hh).day;
-            input(4) = estimatedDays{i}.halfHours(hh).hour;
-            input(5) = estimatedDays{i}.halfHours(hh).weather.tempm;
-            input(6) = estimatedDays{i}.halfHours(hh).weather.hum;
-            input(7) = estimatedDays{i}.halfHours(hh).weather.rain;
-            input(8) = estimatedDays{i}.halfHours(hh).weather.wspdm;
-            input(9) = estimatedDays{i}.halfHours(hh).weather.vism;
-            input(10) = estimatedDays{i}.halfHours(hh).weather.windchillm;
-            input(11) = estimatedDays{i}.halfHours(hh).weather.thunder;
-            estimatedDays{i}.halfHours(hh).routeUsage = reshape(nnHWDef10h(input),[length(getStationList()),length(getStationList())]);
-        else
-            estimatedDays{i}.stationDemand = dsdpDef6hid(input);
-        end
+    if strcmp(task,'BRP')
+        input(2) = estimatedDays{i}.halfHours(1).month;
+        input(3) = estimatedDays{i}.halfHours(1).day;
+
+        input(4) = estimatedDays{i}.halfHours(10).weather.tempm;
+        input(5) = estimatedDays{i}.halfHours(20).weather.tempm;
+        input(6) = estimatedDays{i}.halfHours(30).weather.tempm;
+        input(7) = estimatedDays{i}.halfHours(40).weather.tempm;
+
+        input(8) = estimatedDays{i}.halfHours(1).weather.rain + estimatedDays{i}.halfHours(2).weather.rain + estimatedDays{i}.halfHours(3).weather.rain + estimatedDays{i}.halfHours(4).weather.rain + estimatedDays{i}.halfHours(5).weather.rain + estimatedDays{i}.halfHours(6).weather.rain + estimatedDays{i}.halfHours(7).weather.rain + estimatedDays{i}.halfHours(8).weather.rain + estimatedDays{i}.halfHours(9).weather.rain + estimatedDays{i}.halfHours(10).weather.rain;
+        input(9) = estimatedDays{i}.halfHours(11).weather.rain + estimatedDays{i}.halfHours(12).weather.rain + estimatedDays{i}.halfHours(13).weather.rain + estimatedDays{i}.halfHours(14).weather.rain + estimatedDays{i}.halfHours(15).weather.rain + estimatedDays{i}.halfHours(16).weather.rain + estimatedDays{i}.halfHours(17).weather.rain + estimatedDays{i}.halfHours(18).weather.rain + estimatedDays{i}.halfHours(19).weather.rain + estimatedDays{i}.halfHours(20).weather.rain;
+        input(10) = estimatedDays{i}.halfHours(21).weather.rain + estimatedDays{i}.halfHours(22).weather.rain + estimatedDays{i}.halfHours(23).weather.rain + estimatedDays{i}.halfHours(24).weather.rain + estimatedDays{i}.halfHours(25).weather.rain + estimatedDays{i}.halfHours(26).weather.rain + estimatedDays{i}.halfHours(27).weather.rain + estimatedDays{i}.halfHours(28).weather.rain + estimatedDays{i}.halfHours(29).weather.rain + estimatedDays{i}.halfHours(30).weather.rain;
+        input(11) = estimatedDays{i}.halfHours(31).weather.rain + estimatedDays{i}.halfHours(32).weather.rain + estimatedDays{i}.halfHours(33).weather.rain + estimatedDays{i}.halfHours(34).weather.rain + estimatedDays{i}.halfHours(35).weather.rain + estimatedDays{i}.halfHours(36).weather.rain + estimatedDays{i}.halfHours(37).weather.rain + estimatedDays{i}.halfHours(38).weather.rain + estimatedDays{i}.halfHours(39).weather.rain + estimatedDays{i}.halfHours(40).weather.rain; 
+        input(12) = estimatedDays{i}.halfHours(41).weather.rain + estimatedDays{i}.halfHours(42).weather.rain + estimatedDays{i}.halfHours(43).weather.rain + estimatedDays{i}.halfHours(44).weather.rain + estimatedDays{i}.halfHours(45).weather.rain + estimatedDays{i}.halfHours(46).weather.rain + estimatedDays{i}.halfHours(47).weather.rain + estimatedDays{i}.halfHours(48).weather.rain;
+        estimatedDays{i}.routeUsage = reshape(nnHW24hid(input),[length(getStationList()),length(getStationList())]);
+    else
+        estimatedDays{i}.stationDemand = dsdpDef6hid(input);
     end
     estimatedDays{i}.getTopRoutes();
 end

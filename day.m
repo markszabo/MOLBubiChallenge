@@ -22,34 +22,33 @@ classdef day < handle %needed to enable functions to change the properties of th
           obj.halfHours(length(obj.halfHours)+1) = h;
       end
       
+      function rUsage = getRoutesFromHalfHours(obj)
+          %summarize the halfHour route usages
+          obj.routeUsage = zeros(length(getStationList()));
+          for i = 1:length(obj.halfHours)
+             obj.routeUsage = obj.routeUsage + obj.halfHours(i).getRoutes();
+          end
+          rUsage = obj.routeUsage;
+      end
+      
       function top = getTopRoutes(obj) %get top 100 routes in this format: 0201-0202,4
-          if(not(isempty(obj.topRoutes)))
-              top = obj.topRoutes;
-          else
-              %first summarize the halfHour route usages
-              obj.routeUsage = zeros(length(getStationList()));
-              for i = 1:length(obj.halfHours)
-                 obj.routeUsage = obj.routeUsage + obj.halfHours(i).getRoutes();
-              end
-              %then calculate the tops
-              topNrs = zeros(100);
-              top = repmat({''}, 100, 1);
-              for i = 1:size(obj.routeUsage,1)
-                  for j = 1:size(obj.routeUsage,2)
-                      if(obj.routeUsage(i,j) > 0) %if 0, just skip
-                          for t = 1:length(topNrs)
-                              if(topNrs(t) < obj.routeUsage(i,j))
-                                  topNrs = [topNrs(1:t-1) obj.routeUsage(i,j) topNrs(t:99)];
-                                  newTop = strcat(id2station(i),'-',id2station(j),',',num2str(obj.routeUsage(i,j)));
-                                  top = {top{1:t-1} newTop top{t:99}};
-                                  break;
-                              end
+          topNrs = zeros(100);
+          top = repmat({''}, 100, 1);
+          for i = 1:size(obj.routeUsage,1)
+              for j = 1:size(obj.routeUsage,2)
+                  if(obj.routeUsage(i,j) > 0) %if 0, just skip
+                      for t = 1:length(topNrs)
+                          if(topNrs(t) < obj.routeUsage(i,j))
+                              topNrs = [topNrs(1:t-1) obj.routeUsage(i,j) topNrs(t:99)];
+                              newTop = strcat(id2station(i),'-',id2station(j),',',num2str(obj.routeUsage(i,j)));
+                              top = {top{1:t-1} newTop top{t:99}};
+                              break;
                           end
                       end
                   end
               end
-              obj.topRoutes = top;
           end
+          obj.topRoutes = top;
       end
       
       function demand = getStationDemand(obj)
