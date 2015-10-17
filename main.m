@@ -57,17 +57,20 @@ end
 %% add weather data to days
 weathercsv = fopen('mol_bubi_dataset/weather_data.csv','r'); % open csv file for reading
 fgets(weathercsv); %get rid of the header
-dayCount = 1;
-estdayCount = 1;
+dayCount = 0;
+estdayCount = 0;
 for i=1:(length(days)+30)
     isFirst = true;
     isEstDay = false;
-    for j=1:48
+    j = 1;
+    while j <= 48
         line = fgets(weathercsv);
+        row = strsplit(line, ' ');
+        date = strsplit(row{1}, '-'); % date = {2015, 02, 18}
+        linetime = strsplit(row{2}, ':'); % time = {12, 35, 10} for 12:35:10
+        linehour = str2double(linetime{1}) + 0.5*(str2double(linetime{2}) >= 30);
         if isFirst
             isFirst = false;
-            row = strsplit(line, ' ');
-            date = strsplit(row{1}, '-');
             isEstDay = ((str2double(date{2}) > 3) && (mod(str2double(date{3}),2) == 0)); %if its 4th or 5th month and even day
             if isEstDay
                 estdayCount = estdayCount + 1;
@@ -76,29 +79,38 @@ for i=1:(length(days)+30)
             end
         end
         if isEstDay
+            while estimatedDays{estdayCount}.halfHours(j).hour ~= linehour
+                estimatedDays{estdayCount}.halfHours(j).weather = estimatedDays{estdayCount}.halfHours(j-1).weather;
+                j = j+1; %sometimes data for some hours are missing, so copy the previous one
+            end
             estimatedDays{estdayCount}.halfHours(j).weather = weather(line);
         else
+            while days{dayCount}.halfHours(j).hour ~= linehour
+                days{dayCount}.halfHours(j).weather = days{dayCount}.halfHours(j-1).weather;
+                j = j+1;
+            end
             days{dayCount}.halfHours(j).weather = weather(line);
         end
+        j = j+1;
     end
 end
 fclose(weathercsv);
 
 %% precalculate given days
 clear nnTargets; clear nnInputs;
-nnInputs = zeros(3,length(days));
+nnInputs = zeros(11,length(days));
 if strcmp(task,'BRP')
     nnTargets = zeros(length(getStationList())*length(getStationList()),nrOfHalfHours);
 else %DSDP
     nnTargets = zeros(length(getStationList()),length(days));
 end
-countTheHHours = 1;
+countTheHHours = 0;
 for i=1:length(days)
     for j=1:length(days{i}.halfHours)
         if strcmp(task,'BRP')
+            countTheHHours = 1 + countTheHHours;
             nnTargets(:,countTheHHours) = reshape(days{i}.halfHours(j).getRoutes(),[length(getStationList())*length(getStationList()),1]);
             %days{i}.getTopRoutes();
-            countTheHHours = 1 + countTheHHours;
         else
             nnTargets(:,i) = days{i}.getStationDemand();
         end
@@ -106,6 +118,13 @@ for i=1:length(days)
         nnInputs(2,countTheHHours) = days{i}.halfHours(j).month;
         nnInputs(3,countTheHHours) = days{i}.halfHours(j).day;
         nnInputs(4,countTheHHours) = days{i}.halfHours(j).hour;
+        nnInputs(5,countTheHHours) = days{i}.halfHours(j).weather.tempm;
+        nnInputs(6,countTheHHours) = days{i}.halfHours(j).weather.hum;
+        nnInputs(7,countTheHHours) = days{i}.halfHours(j).weather.rain;
+        nnInputs(8,countTheHHours) = days{i}.halfHours(j).weather.wspdm;
+        nnInputs(9,countTheHHours) = days{i}.halfHours(j).weather.vism;
+        nnInputs(10,countTheHHours) = days{i}.halfHours(j).weather.windchillm;
+        nnInputs(11,countTheHHours) = days{i}.halfHours(j).weather.thunder;
     end
 end
 
@@ -113,16 +132,21 @@ end
 
 %% neural network estimation
 for i=1:30
-    input = zeros(4,1);
+    input = zeros(11,1);
     input(1) = weekday(estimatedDays{i}.date);
-    date = strsplit(estimatedDays{i}.date, '-');
-    input(2) = str2double(cell2mat(date(2))); %month
-    input(3) = str2double(cell2mat(date(3))); %day
     for hh=1:48
         if strcmp(task,'BRP')
-            estimatedDays{i}.halfHours(hh) = halfHour(input(2),input(3),hh*0.5);
-            input(4) = hh*0.5;
-            estimatedDays{i}.halfHours(hh).routeUsage = reshape(nnHourDef10h(input),[length(getStationList()),length(getStationList())]);
+            input(2) = estimatedDays{i}.halfHours(hh).month;
+            input(3) = estimatedDays{i}.halfHours(hh).day;
+            input(4) = estimatedDays{i}.halfHours(hh).hour;
+            input(5) = estimatedDays{i}.halfHours(hh).weather.tempm;
+            input(6) = estimatedDays{i}.halfHours(hh).weather.hum;
+            input(7) = estimatedDays{i}.halfHours(hh).weather.rain;
+            input(8) = estimatedDays{i}.halfHours(hh).weather.wspdm;
+            input(9) = estimatedDays{i}.halfHours(hh).weather.vism;
+            input(10) = estimatedDays{i}.halfHours(hh).weather.windchillm;
+            input(11) = estimatedDays{i}.halfHours(hh).weather.thunder;
+            estimatedDays{i}.halfHours(hh).routeUsage = reshape(nnHWDef10h(input),[length(getStationList()),length(getStationList())]);
         else
             estimatedDays{i}.stationDemand = dsdpDef6hid(input);
         end

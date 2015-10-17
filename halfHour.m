@@ -10,10 +10,21 @@ classdef halfHour < handle %needed to enable functions to change the properties 
     methods
         function h = halfHour(m, d, hh)
             h.trips = trip.empty;
-            %h.weather = weather.empty; not sure if needed
-            h.month = m;
-            h.day = d;
-            h.hour = hh;
+            if ischar(m) 
+                h.month = str2double(m);
+            else
+                h.month = m;
+            end
+            if ischar(d)
+                h.day = str2double(d);
+            else
+                h.day = d;
+            end
+            if ischar(hh)
+                h.hour = str2double(hh);
+            else
+                h.hour = hh;
+            end
         end
         
         function addTrip(obj, t)
