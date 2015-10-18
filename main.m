@@ -1,7 +1,7 @@
 clear;
 
-%task = 'DSDP';
-task = 'BRP';
+task = 'DSDP';
+%task = 'BRP';
 
 days = cell(1,121);
 days{1} = day('2015-01-01');
@@ -139,23 +139,23 @@ end
 for i=1:30
     input = zeros(12,1);
     input(1) = weekday(estimatedDays{i}.date);
+    input(2) = estimatedDays{i}.halfHours(1).month;
+    input(3) = estimatedDays{i}.halfHours(1).day;
+
+    input(4) = estimatedDays{i}.halfHours(10).weather.tempm;
+    input(5) = estimatedDays{i}.halfHours(20).weather.tempm;
+    input(6) = estimatedDays{i}.halfHours(30).weather.tempm;
+    input(7) = estimatedDays{i}.halfHours(40).weather.tempm;
+
+    input(8) = estimatedDays{i}.halfHours(1).weather.rain + estimatedDays{i}.halfHours(2).weather.rain + estimatedDays{i}.halfHours(3).weather.rain + estimatedDays{i}.halfHours(4).weather.rain + estimatedDays{i}.halfHours(5).weather.rain + estimatedDays{i}.halfHours(6).weather.rain + estimatedDays{i}.halfHours(7).weather.rain + estimatedDays{i}.halfHours(8).weather.rain + estimatedDays{i}.halfHours(9).weather.rain + estimatedDays{i}.halfHours(10).weather.rain;
+    input(9) = estimatedDays{i}.halfHours(11).weather.rain + estimatedDays{i}.halfHours(12).weather.rain + estimatedDays{i}.halfHours(13).weather.rain + estimatedDays{i}.halfHours(14).weather.rain + estimatedDays{i}.halfHours(15).weather.rain + estimatedDays{i}.halfHours(16).weather.rain + estimatedDays{i}.halfHours(17).weather.rain + estimatedDays{i}.halfHours(18).weather.rain + estimatedDays{i}.halfHours(19).weather.rain + estimatedDays{i}.halfHours(20).weather.rain;
+    input(10) = estimatedDays{i}.halfHours(21).weather.rain + estimatedDays{i}.halfHours(22).weather.rain + estimatedDays{i}.halfHours(23).weather.rain + estimatedDays{i}.halfHours(24).weather.rain + estimatedDays{i}.halfHours(25).weather.rain + estimatedDays{i}.halfHours(26).weather.rain + estimatedDays{i}.halfHours(27).weather.rain + estimatedDays{i}.halfHours(28).weather.rain + estimatedDays{i}.halfHours(29).weather.rain + estimatedDays{i}.halfHours(30).weather.rain;
+    input(11) = estimatedDays{i}.halfHours(31).weather.rain + estimatedDays{i}.halfHours(32).weather.rain + estimatedDays{i}.halfHours(33).weather.rain + estimatedDays{i}.halfHours(34).weather.rain + estimatedDays{i}.halfHours(35).weather.rain + estimatedDays{i}.halfHours(36).weather.rain + estimatedDays{i}.halfHours(37).weather.rain + estimatedDays{i}.halfHours(38).weather.rain + estimatedDays{i}.halfHours(39).weather.rain + estimatedDays{i}.halfHours(40).weather.rain; 
+    input(12) = estimatedDays{i}.halfHours(41).weather.rain + estimatedDays{i}.halfHours(42).weather.rain + estimatedDays{i}.halfHours(43).weather.rain + estimatedDays{i}.halfHours(44).weather.rain + estimatedDays{i}.halfHours(45).weather.rain + estimatedDays{i}.halfHours(46).weather.rain + estimatedDays{i}.halfHours(47).weather.rain + estimatedDays{i}.halfHours(48).weather.rain;
     if strcmp(task,'BRP')
-        input(2) = estimatedDays{i}.halfHours(1).month;
-        input(3) = estimatedDays{i}.halfHours(1).day;
-
-        input(4) = estimatedDays{i}.halfHours(10).weather.tempm;
-        input(5) = estimatedDays{i}.halfHours(20).weather.tempm;
-        input(6) = estimatedDays{i}.halfHours(30).weather.tempm;
-        input(7) = estimatedDays{i}.halfHours(40).weather.tempm;
-
-        input(8) = estimatedDays{i}.halfHours(1).weather.rain + estimatedDays{i}.halfHours(2).weather.rain + estimatedDays{i}.halfHours(3).weather.rain + estimatedDays{i}.halfHours(4).weather.rain + estimatedDays{i}.halfHours(5).weather.rain + estimatedDays{i}.halfHours(6).weather.rain + estimatedDays{i}.halfHours(7).weather.rain + estimatedDays{i}.halfHours(8).weather.rain + estimatedDays{i}.halfHours(9).weather.rain + estimatedDays{i}.halfHours(10).weather.rain;
-        input(9) = estimatedDays{i}.halfHours(11).weather.rain + estimatedDays{i}.halfHours(12).weather.rain + estimatedDays{i}.halfHours(13).weather.rain + estimatedDays{i}.halfHours(14).weather.rain + estimatedDays{i}.halfHours(15).weather.rain + estimatedDays{i}.halfHours(16).weather.rain + estimatedDays{i}.halfHours(17).weather.rain + estimatedDays{i}.halfHours(18).weather.rain + estimatedDays{i}.halfHours(19).weather.rain + estimatedDays{i}.halfHours(20).weather.rain;
-        input(10) = estimatedDays{i}.halfHours(21).weather.rain + estimatedDays{i}.halfHours(22).weather.rain + estimatedDays{i}.halfHours(23).weather.rain + estimatedDays{i}.halfHours(24).weather.rain + estimatedDays{i}.halfHours(25).weather.rain + estimatedDays{i}.halfHours(26).weather.rain + estimatedDays{i}.halfHours(27).weather.rain + estimatedDays{i}.halfHours(28).weather.rain + estimatedDays{i}.halfHours(29).weather.rain + estimatedDays{i}.halfHours(30).weather.rain;
-        input(11) = estimatedDays{i}.halfHours(31).weather.rain + estimatedDays{i}.halfHours(32).weather.rain + estimatedDays{i}.halfHours(33).weather.rain + estimatedDays{i}.halfHours(34).weather.rain + estimatedDays{i}.halfHours(35).weather.rain + estimatedDays{i}.halfHours(36).weather.rain + estimatedDays{i}.halfHours(37).weather.rain + estimatedDays{i}.halfHours(38).weather.rain + estimatedDays{i}.halfHours(39).weather.rain + estimatedDays{i}.halfHours(40).weather.rain; 
-        input(12) = estimatedDays{i}.halfHours(41).weather.rain + estimatedDays{i}.halfHours(42).weather.rain + estimatedDays{i}.halfHours(43).weather.rain + estimatedDays{i}.halfHours(44).weather.rain + estimatedDays{i}.halfHours(45).weather.rain + estimatedDays{i}.halfHours(46).weather.rain + estimatedDays{i}.halfHours(47).weather.rain + estimatedDays{i}.halfHours(48).weather.rain;
         estimatedDays{i}.routeUsage = reshape(nnHW24hid(input),[length(getStationList()),length(getStationList())]);
     else
-        estimatedDays{i}.stationDemand = dsdpDef6hid(input);
+        estimatedDays{i}.stationDemand = DSDP14hidDef(input);
     end
     estimatedDays{i}.getTopRoutes();
 end

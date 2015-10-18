@@ -52,23 +52,21 @@ classdef day < handle %needed to enable functions to change the properties of th
       end
       
       function demand = getStationDemand(obj)
-          if(not(isempty(obj.stationDemand)))
-              demand = obj.stationDemand;
-          else
-              stationList = getStationList();
-              stationState = zeros(1,length(stationList));
-              demand = zeros(1,length(stationList));
-              for i=1:length(obj.trips)
-                  stationState(station2id(obj.trips(i).start_location)) = ...
-                      stationState(station2id(obj.trips(i).start_location)) + 1;
-                  stationState(station2id(obj.trips(i).end_location)) = ...
-                      stationState(station2id(obj.trips(i).end_location)) - 1;
-                  if(stationState(station2id(obj.trips(i).start_location)) > demand(station2id(obj.trips(i).start_location)))
-                      demand(station2id(obj.trips(i).start_location)) = stationState(station2id(obj.trips(i).start_location));
+          stationList = getStationList();
+          stationState = zeros(1,length(stationList));
+          demand = zeros(1,length(stationList));
+          for i=1:length(obj.halfHours)
+              for j=1:length(obj.halfHours(i).trips)
+                  stationState(station2id(obj.halfHours(i).trips(j).start_location)) = ...
+                      stationState(station2id(obj.halfHours(i).trips(j).start_location)) + 1;
+                  stationState(station2id(obj.halfHours(i).trips(j).end_location)) = ...
+                      stationState(station2id(obj.halfHours(i).trips(j).end_location)) - 1;
+                  if(stationState(station2id(obj.halfHours(i).trips(j).start_location)) > demand(station2id(obj.halfHours(i).trips(j).start_location)))
+                      demand(station2id(obj.halfHours(i).trips(j).start_location)) = stationState(station2id(obj.halfHours(i).trips(j).start_location));
                   end
               end
-              obj.stationDemand = demand;
           end
+          obj.stationDemand = demand;
       end
    end
 end

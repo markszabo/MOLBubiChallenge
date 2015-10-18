@@ -50,3 +50,9 @@ My trials and errors for the MOL Bubi Big Data Challenge (https://dms.sztaki.hu/
 2015-10-17 BRP same as before just with Bayesian method and 12 hidden neuron (for the 12 inputs). Slightly better result: 0.656297313
 
 2015-10-17 BRP same as before just def algo, 24 hidden neuron. Slightly better: 0.658004536
+
+2015-10-18 DSDP previous input was implemented for DSDP. NN with 24 hidden neuron and default algorithm. Worse: 5.458809967
+
+2015-10-18 DSDP same as before just 12 neuron (12 input). Getting better: 4.617493597
+
+2015-10-18 DSDP same as before just 14 neuron. Slightly better: 4.592675851
